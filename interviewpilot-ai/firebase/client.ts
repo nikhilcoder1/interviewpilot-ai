@@ -1,51 +1,26 @@
-import { generateText } from "ai";
-import { google } from "@ai-sdk/google";
+// Import the functions you need from the SDKs you need
+import { getApp, getApps, initializeApp } from "firebase/app";
+// import { getAnalytics } from "firebase/analytics";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
-import { db } from "@/firebase/admin";
-import { getRandomInterviewCover } from "@/lib/utils";
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
+};
 
-export async function POST(request: Request) {
-  const { type, role, level, techstack, amount, userid } = await request.json();
+// Initialize Firebase
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+// const analytics = getAnalytics(app);
 
-  try {
-    const { text: questions } = await generateText({
-      model: google("gemini-2.0-flash-001"),
-      prompt: `Prepare questions for a job interview.
-        The job role is ${role}.
-        The job experience level is ${level}.
-        The tech stack used in the job is: ${techstack}.
-        The focus between behavioural and technical questions should lean towards: ${type}.
-        The amount of questions required is: ${amount}.
-        Please return only the questions, without any additional text.
-        The questions are going to be read by a voice assistant so do not use "/" or "*" or any other special characters which might break the voice assistant.
-        Return the questions formatted like this:
-        ["Question 1", "Question 2", "Question 3"]
-        
-        Thank you! <3
-    `,
-    });
-
-    const interview = {
-      role: role,
-      type: type,
-      level: level,
-      techstack: techstack.split(","),
-      questions: JSON.parse(questions),
-      userId: userid,
-      finalized: true,
-      coverImage: getRandomInterviewCover(),
-      createdAt: new Date().toISOString(),
-    };
-
-    await db.collection("interviews").add(interview);
-
-    return Response.json({ success: true }, { status: 200 });
-  } catch (error) {
-    console.error("Error:", error);
-    return Response.json({ success: false, error: error }, { status: 500 });
-  }
-}
-
-export async function GET() {
-  return Response.json({ success: true, data: "Thank you!" }, { status: 200 });
-}
+export const auth = getAuth(app);
+export const db = getFirestore(app);
