@@ -48,11 +48,15 @@ export async function POST(request: Request) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        workflowId: "be01d6f2-db7f-4df7-9487-d5d139a6f83e", // your workflow ID
+        assistantId: "d7b0177b-70b9-4233-a6f0-f0e10df3a26f",
+
+        workflowId: "be01d6f2-db7f-4df7-9487-d5d139a6f83e",
+
         metadata: {
           interviewId: docRef.id,
           userId: userid,
         },
+
         variables: {
           questions: parsedQuestions.join(". "),
           username: "Candidate",
