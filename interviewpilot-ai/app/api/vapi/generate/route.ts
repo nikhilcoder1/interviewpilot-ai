@@ -44,7 +44,7 @@ export async function POST(request: Request) {
     const vapiResponse = await fetch("https://api.vapi.ai/call", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${process.env.VAPI_API_KEY}`,
+        Authorization: `Bearer ${process.env.VAPI_PRIVATE_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -52,16 +52,16 @@ export async function POST(request: Request) {
 
         workflowId: "be01d6f2-db7f-4df7-9487-d5d139a6f83e",
 
+        input: {
+          questions: parsedQuestions.join(". "),
+          username: "Candidate",
+          role: role
+        },
+
         metadata: {
           interviewId: docRef.id,
           userId: userid,
-        },
-
-        variables: {
-          questions: parsedQuestions.join(". "),
-          username: "Candidate",
-          role: role,
-        },
+        }
       }),
     });
 
